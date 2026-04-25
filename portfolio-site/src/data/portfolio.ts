@@ -5,6 +5,7 @@ export const portfolioData: PortfolioData = {
   title: "Frontend Developer (React / Next.js)",
   summary:
     "Mid-level Frontend Developer with 2+ years of experience building responsive, scalable, and high-performance web applications using React.js, JavaScript, and TypeScript.",
+  resumeUrl: "/resume.pdf",
   location: "Rawalpindi, Pakistan",
   availability: "Open to frontend and full-stack opportunities",
   qualifications: [
@@ -112,6 +113,7 @@ export const portfolioData: PortfolioData = {
     { label: "Email", href: "mailto:asifnawazsharif3@gmail.com" },
     { label: "Phone", href: "tel:+923040974004" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/asif-nawaz-sharif/" },
+    { label: "GitHub", href: "https://github.com/asifnawazshareef" },
   ],
   nav: [
     { label: "Qualifications", href: "#qualifications" },
@@ -122,6 +124,5 @@ export const portfolioData: PortfolioData = {
     { label: "Certifications", href: "#certifications" },
     { label: "Resume", href: "#resume" },
     { label: "Contact", href: "/contact" },
-    { label: "Admin", href: "/admin" },
   ],
 };

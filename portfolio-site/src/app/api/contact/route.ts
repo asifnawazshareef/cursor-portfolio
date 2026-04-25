@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
 import { contactSchema } from "@/lib/validations";
 
+export const runtime = "nodejs";
+
 const requestMap = new Map<string, number>();
 
 function isRateLimited(key: string) {
@@ -34,11 +36,17 @@ export async function POST(request: Request) {
     const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
     const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL ?? "asifnawazsharif3@gmail.com";
 
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
+    const missing = [
+      !SMTP_HOST ? "SMTP_HOST" : null,
+      !SMTP_PORT ? "SMTP_PORT" : null,
+      !SMTP_USER ? "SMTP_USER" : null,
+      !SMTP_PASS ? "SMTP_PASS" : null,
+    ].filter(Boolean);
+
+    if (missing.length > 0) {
       return NextResponse.json(
         {
-          message:
-            "Message received, but email service is not configured yet. Add SMTP env vars to enable delivery.",
+          message: `Email service is not configured. Missing env vars: ${missing.join(", ")}.`,
         },
         { status: 503 },
       );
@@ -55,6 +63,8 @@ export async function POST(request: Request) {
     });
 
     const { name, email, subject, message } = parsed.data;
+    await transporter.verify();
+
     await transporter.sendMail({
       from: `"Portfolio Contact" <${SMTP_USER}>`,
       to: receiverEmail,
@@ -74,9 +84,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ message: "Thanks for reaching out. Message sent successfully." });
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unexpected server error.";
     return NextResponse.json(
-      { message: "Unexpected server error. Please try again." },
+      { message: `Email send failed: ${message}` },
       { status: 500 },
     );
   }

@@ -29,6 +29,7 @@ A recruiter-focused portfolio website with reusable frontend sections and backen
 - `POST /api/contact` - validates and sends contact messages
 - `POST /api/admin/login` - authenticates dashboard
 - `GET/PUT /api/admin/portfolio` - reads and updates portfolio data
+- `POST /api/admin/resume` - uploads and updates resume PDF URL
 
 ## Local Setup
 
@@ -50,4 +51,20 @@ Open [http://localhost:3000](http://localhost:3000)
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 
-If SMTP variables are missing, the API returns a configuration message.
+## Gmail SMTP Configuration
+
+Use Gmail SMTP values:
+
+- `SMTP_HOST=smtp.gmail.com`
+- `SMTP_PORT=587`
+- `SMTP_USER=asifnawazsharif3@gmail.com`
+- `SMTP_PASS=<Google App Password>`
+- `CONTACT_RECEIVER_EMAIL=asifnawazsharif3@gmail.com`
+
+Important: Gmail account password does not work directly. Use a 16-character Google App Password.
+
+## Dynamic Data Persistence
+
+- Portfolio data is persisted at `data/portfolio.json`
+- Resume uploads are stored in `public/uploads`
+- Home/contact pages fetch data from API for dynamic updates

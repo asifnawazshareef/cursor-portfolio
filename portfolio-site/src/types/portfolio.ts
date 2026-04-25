@@ -41,6 +41,7 @@ export type PortfolioData = {
   name: string;
   title: string;
   summary: string;
+  resumeUrl: string;
   location: string;
   availability: string;
   qualifications: string[];

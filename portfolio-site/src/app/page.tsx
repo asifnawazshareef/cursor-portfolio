@@ -17,19 +17,47 @@ import {
 
 export default function Home() {
   const [data, setData] = useState<PortfolioData | null>(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const response = await fetch("/api/portfolio", { cache: "no-store" });
-      const payload = (await response.json()) as PortfolioData;
-      setData(payload);
+      try {
+        setIsLoading(true);
+        setError("");
+        const response = await fetch("/api/portfolio", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("Failed to load portfolio data.");
+        }
+        const payload = (await response.json()) as PortfolioData;
+        setData(payload);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unable to load data.";
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     load();
   }, []);
 
-  if (!data) {
-    return <main className="container-max py-20 text-slate-300">Loading portfolio...</main>;
+  if (isLoading) {
+    return (
+      <main className="container-max py-20">
+        <div className="glass animate-pulse rounded-3xl p-10 text-slate-300">Loading portfolio...</div>
+      </main>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <main className="container-max py-20">
+        <div className="glass rounded-3xl p-10 text-rose-300">
+          {error || "Portfolio data is unavailable right now."}
+        </div>
+      </main>
+    );
   }
 
   const {
@@ -47,7 +75,10 @@ export default function Home() {
     certifications,
     contacts,
     nav,
+    resumeUrl,
   } = data;
+
+  const githubLink = contacts.find((contact) => contact.label === "GitHub")?.href;
 
   return (
     <div className="relative overflow-x-clip">
@@ -96,12 +127,16 @@ export default function Home() {
             >
               LinkedIn Profile
             </a>
-            <Link
-              href="/admin"
-              className="rounded-full border border-slate-700 px-5 py-3 font-medium text-slate-200 transition hover:border-accent hover:text-accent"
-            >
-              Admin Dashboard
-            </Link>
+            {githubLink ? (
+              <a
+                href={githubLink}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-slate-700 px-5 py-3 font-medium text-slate-200 transition hover:border-accent hover:text-accent"
+              >
+                GitHub Profile
+              </a>
+            ) : null}
           </div>
         </section>
 
@@ -236,11 +271,11 @@ export default function Home() {
           <div className="glass rounded-3xl p-4 md:p-6">
             <iframe
               title="Asif Nawaz Resume"
-              src="/resume.pdf"
+              src={resumeUrl}
               className="h-[620px] w-full rounded-2xl border border-slate-700"
             />
             <a
-              href="/resume.pdf"
+              href={resumeUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-flex rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-accent hover:text-accent"

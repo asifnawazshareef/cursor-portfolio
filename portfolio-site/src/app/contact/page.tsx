@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
-import { portfolioData } from "@/data/portfolio";
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { contactSchema } from "@/lib/validations";
+import { PortfolioData } from "@/types/portfolio";
+import { FaCircleNotch, FaEnvelope, FaGithub, FaLinkedin, FaPhone } from "react-icons/fa6";
 
 const initialForm = {
   name: "",
@@ -16,8 +17,35 @@ export default function ContactPage() {
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+  const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const contactList = useMemo(() => portfolioData.contacts, []);
+  useEffect(() => {
+    async function loadPortfolio() {
+      try {
+        const response = await fetch("/api/portfolio", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("Unable to load contact details.");
+        }
+        const payload = (await response.json()) as PortfolioData;
+        setPortfolio(payload);
+      } catch {
+        setPortfolio(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadPortfolio();
+  }, []);
+
+  const contactList = useMemo(() => portfolio?.contacts ?? [], [portfolio]);
+
+  const iconMap: Record<string, ReactNode> = {
+    Email: <FaEnvelope className="text-accent" />,
+    Phone: <FaPhone className="text-accent" />,
+    LinkedIn: <FaLinkedin className="text-accent" />,
+    GitHub: <FaGithub className="text-accent" />,
+  };
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -116,9 +144,15 @@ export default function ContactPage() {
           <button
             type="submit"
             disabled={status === "sending"}
-            className="rounded-full bg-accent px-5 py-3 font-medium text-slate-950 transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full bg-accent px-5 py-3 font-medium text-slate-950 transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 inline-flex items-center gap-2"
           >
-            {status === "sending" ? "Sending..." : "Send Message"}
+            {status === "sending" ? (
+              <>
+                <FaCircleNotch className="animate-spin" /> Sending...
+              </>
+            ) : (
+              "Send Message"
+            )}
           </button>
           {feedback ? (
             <p className={status === "success" ? "text-emerald-400" : "text-rose-400"}>{feedback}</p>
@@ -130,6 +164,7 @@ export default function ContactPage() {
           <p className="text-sm text-slate-300">
             You can also reach me directly through email, phone, or LinkedIn.
           </p>
+          {isLoading ? <p className="text-sm text-slate-400">Loading contact links...</p> : null}
           <div className="space-y-3">
             {contactList.map((contact) => (
               <a
@@ -137,7 +172,10 @@ export default function ContactPage() {
                 href={contact.href}
                 className="block rounded-xl border border-slate-700 p-3 text-slate-200 transition hover:border-accent hover:text-accent"
               >
-                {contact.label}
+                <span className="inline-flex items-center gap-2">
+                  {iconMap[contact.label] ?? <FaEnvelope className="text-accent" />}
+                  {contact.label}
+                </span>
               </a>
             ))}
           </div>

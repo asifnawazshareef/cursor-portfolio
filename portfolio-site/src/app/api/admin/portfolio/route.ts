@@ -3,12 +3,15 @@ import { hasAdminSession } from "@/lib/admin-auth";
 import { getPortfolioData, updatePortfolioData } from "@/lib/portfolio-store";
 import { PortfolioData } from "@/types/portfolio";
 
+export const runtime = "nodejs";
+
 export async function GET() {
   if (!(await hasAdminSession())) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json(getPortfolioData());
+  const data = await getPortfolioData();
+  return NextResponse.json(data);
 }
 
 export async function PUT(request: Request) {
@@ -17,6 +20,6 @@ export async function PUT(request: Request) {
   }
 
   const payload = (await request.json()) as PortfolioData;
-  const updated = updatePortfolioData(payload);
+  const updated = await updatePortfolioData(payload);
   return NextResponse.json(updated);
 }
