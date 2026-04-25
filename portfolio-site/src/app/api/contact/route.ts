@@ -31,8 +31,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: firstError }, { status: 400 });
     }
 
-    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_RECEIVER_EMAIL } = process.env;
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !CONTACT_RECEIVER_EMAIL) {
+    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
+    const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL ?? "asifnawazsharif3@gmail.com";
+
+    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
       return NextResponse.json(
         {
           message:
@@ -55,7 +57,7 @@ export async function POST(request: Request) {
     const { name, email, subject, message } = parsed.data;
     await transporter.sendMail({
       from: `"Portfolio Contact" <${SMTP_USER}>`,
-      to: CONTACT_RECEIVER_EMAIL,
+      to: receiverEmail,
       replyTo: email,
       subject: `[Portfolio] ${subject}`,
       text: `From: ${name} <${email}>\n\n${message}`,

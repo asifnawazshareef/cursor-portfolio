@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { portfolioData } from "@/data/portfolio";
+import { getPortfolioData } from "@/lib/portfolio-store";
 
 export async function GET() {
-  return NextResponse.json(portfolioData);
+  return NextResponse.json(getPortfolioData());
 }

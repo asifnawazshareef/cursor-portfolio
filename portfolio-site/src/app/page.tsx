@@ -1,8 +1,37 @@
-import Link from "next/link";
-import { portfolioData } from "@/data/portfolio";
+"use client";
+
 import { SectionHeading } from "@/components/section-heading";
+import { PortfolioData } from "@/types/portfolio";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  FaBriefcase,
+  FaCertificate,
+  FaCode,
+  FaEnvelopeOpenText,
+  FaGraduationCap,
+  FaLocationDot,
+  FaRocket,
+  FaScrewdriverWrench,
+} from "react-icons/fa6";
 
 export default function Home() {
+  const [data, setData] = useState<PortfolioData | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      const response = await fetch("/api/portfolio", { cache: "no-store" });
+      const payload = (await response.json()) as PortfolioData;
+      setData(payload);
+    }
+
+    load();
+  }, []);
+
+  if (!data) {
+    return <main className="container-max py-20 text-slate-300">Loading portfolio...</main>;
+  }
+
   const {
     name,
     title,
@@ -18,7 +47,7 @@ export default function Home() {
     certifications,
     contacts,
     nav,
-  } = portfolioData;
+  } = data;
 
   return (
     <div className="relative overflow-x-clip">
@@ -41,21 +70,23 @@ export default function Home() {
 
       <main className="container-max space-y-20 py-10 pb-20">
         <section className="glass rounded-3xl p-8 md:p-12">
-          <p className="mb-3 text-sm uppercase tracking-[0.22em] text-accent">
-            Frontend Portfolio
+          <p className="mb-3 inline-flex items-center gap-2 text-sm uppercase tracking-[0.22em] text-accent">
+            <FaRocket /> Frontend Portfolio
           </p>
           <h1 className="text-3xl font-bold text-slate-50 md:text-5xl">{title}</h1>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-300">{summary}</p>
           <div className="mt-7 flex flex-wrap gap-4 text-sm text-slate-300">
-            <span className="rounded-full bg-muted px-3 py-2">{location}</span>
+            <span className="rounded-full bg-muted px-3 py-2 inline-flex items-center gap-2">
+              <FaLocationDot /> {location}
+            </span>
             <span className="rounded-full bg-muted px-3 py-2">{availability}</span>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/contact"
-              className="rounded-full bg-accent px-5 py-3 font-medium text-slate-950 transition hover:opacity-90"
+              className="rounded-full bg-accent px-5 py-3 font-medium text-slate-950 transition hover:opacity-90 inline-flex items-center gap-2"
             >
-              Contact Me
+              <FaEnvelopeOpenText /> Contact Me
             </Link>
             <a
               href={contacts.find((contact) => contact.label === "LinkedIn")?.href}
@@ -65,6 +96,12 @@ export default function Home() {
             >
               LinkedIn Profile
             </a>
+            <Link
+              href="/admin"
+              className="rounded-full border border-slate-700 px-5 py-3 font-medium text-slate-200 transition hover:border-accent hover:text-accent"
+            >
+              Admin Dashboard
+            </Link>
           </div>
         </section>
 
@@ -76,7 +113,10 @@ export default function Home() {
           />
           <div className="grid gap-4 md:grid-cols-2">
             {qualifications.map((qualification) => (
-              <article key={qualification} className="glass rounded-2xl p-5 text-slate-200">
+              <article
+                key={qualification}
+                className="glass rounded-2xl p-5 text-slate-200 border border-accent/20"
+              >
                 {qualification}
               </article>
             ))}
@@ -97,7 +137,9 @@ export default function Home() {
             {experiences.map((item) => (
               <article key={item.company} className="glass rounded-2xl p-6">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="text-xl font-semibold text-slate-100">{item.role}</h3>
+                  <h3 className="text-xl font-semibold text-slate-100 inline-flex items-center gap-2">
+                    <FaBriefcase className="text-accent" /> {item.role}
+                  </h3>
                   <p className="text-sm text-slate-400">{item.timeline}</p>
                 </div>
                 <p className="mt-1 text-slate-300">{item.company}</p>
@@ -115,7 +157,11 @@ export default function Home() {
           <SectionHeading id="skills" eyebrow="Capability" title="Core Skills" />
           <div className="flex flex-wrap gap-3">
             {skills.map((skill) => (
-              <span key={skill} className="rounded-full bg-card px-4 py-2 text-sm text-slate-200">
+              <span
+                key={skill}
+                className="rounded-full bg-card px-4 py-2 text-sm text-slate-200 border border-slate-700 inline-flex items-center gap-2"
+              >
+                <FaCode className="text-accent" />
                 {skill}
               </span>
             ))}
@@ -127,7 +173,9 @@ export default function Home() {
           <div className="grid gap-4">
             {education.map((item) => (
               <article key={item.institute} className="glass rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-slate-100">{item.degree}</h3>
+                <h3 className="text-lg font-semibold text-slate-100 inline-flex items-center gap-2">
+                  <FaGraduationCap className="text-accent" /> {item.degree}
+                </h3>
                 <p className="mt-1 text-slate-300">{item.institute}</p>
                 <p className="mt-2 text-sm text-slate-400">{item.timeline}</p>
               </article>
@@ -138,9 +186,17 @@ export default function Home() {
         <section className="space-y-8">
           <SectionHeading id="projects" eyebrow="Portfolio" title="Highlighted Projects" />
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
-              <article key={project.title} className="glass flex flex-col rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-slate-100">{project.title}</h3>
+            {projects.map((project, index) => (
+              <article
+                key={project.title}
+                className={`glass flex flex-col rounded-2xl p-6 border ${
+                  index === 0 ? "border-accent/70 shadow-[0_0_35px_rgba(56,189,248,0.2)]" : "border-slate-700"
+                }`}
+              >
+                <h3 className="text-lg font-semibold text-slate-100 inline-flex items-center gap-2">
+                  <FaScrewdriverWrench className="text-accent" />
+                  {project.title}
+                </h3>
                 <p className="mt-2 text-sm text-slate-300">{project.summary}</p>
                 <p className="mt-3 text-sm text-slate-400">{project.impact}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -160,11 +216,37 @@ export default function Home() {
           <div className="grid gap-4 md:grid-cols-2">
             {certifications.map((certification) => (
               <article key={certification.title} className="glass rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-slate-100">{certification.title}</h3>
+                <h3 className="text-lg font-semibold text-slate-100 inline-flex items-center gap-2">
+                  <FaCertificate className="text-accent" /> {certification.title}
+                </h3>
                 <p className="mt-1 text-slate-300">{certification.issuer}</p>
                 <p className="mt-2 text-sm text-slate-400">{certification.year}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="space-y-8">
+          <SectionHeading
+            id="resume"
+            eyebrow="Resume"
+            title="Preview Resume PDF"
+            subtitle="Recruiters can view your resume without leaving the portfolio."
+          />
+          <div className="glass rounded-3xl p-4 md:p-6">
+            <iframe
+              title="Asif Nawaz Resume"
+              src="/resume.pdf"
+              className="h-[620px] w-full rounded-2xl border border-slate-700"
+            />
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:border-accent hover:text-accent"
+            >
+              Open Resume in New Tab
+            </a>
           </div>
         </section>
 

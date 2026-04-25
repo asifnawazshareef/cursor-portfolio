@@ -22,6 +22,8 @@ export const portfolioData: PortfolioData = {
   ],
   skills: [
     "React.js",
+    "Advanced React.js Patterns",
+    "React Performance Optimization",
     "Next.js",
     "JavaScript (ES6+)",
     "TypeScript",
@@ -118,6 +120,8 @@ export const portfolioData: PortfolioData = {
     { label: "Education", href: "#education" },
     { label: "Projects", href: "#projects" },
     { label: "Certifications", href: "#certifications" },
+    { label: "Resume", href: "#resume" },
     { label: "Contact", href: "/contact" },
+    { label: "Admin", href: "/admin" },
   ],
 };

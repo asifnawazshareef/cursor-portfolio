@@ -19,12 +19,16 @@ A recruiter-focused portfolio website with reusable frontend sections and backen
 - Education
 - Projects
 - Certifications
+- Resume preview
 - Contact page
+- Admin dashboard (`/admin`)
 
 ## API Endpoints
 
 - `GET /api/portfolio` - returns all portfolio content
 - `POST /api/contact` - validates and sends contact messages
+- `POST /api/admin/login` - authenticates dashboard
+- `GET/PUT /api/admin/portfolio` - reads and updates portfolio data
 
 ## Local Setup
 
@@ -43,5 +47,7 @@ Open [http://localhost:3000](http://localhost:3000)
 - `SMTP_USER`
 - `SMTP_PASS`
 - `CONTACT_RECEIVER_EMAIL`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
 
 If SMTP variables are missing, the API returns a configuration message.
