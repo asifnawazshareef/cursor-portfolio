@@ -7,12 +7,13 @@ import { useEffect, useState } from "react";
 import {
   FaBriefcase,
   FaCertificate,
-  FaCode,
   FaEnvelopeOpenText,
   FaGraduationCap,
+  FaLayerGroup,
   FaLocationDot,
   FaRocket,
   FaScrewdriverWrench,
+  FaStar,
 } from "react-icons/fa6";
 
 export default function Home() {
@@ -79,6 +80,12 @@ export default function Home() {
   } = data;
 
   const githubLink = contacts.find((contact) => contact.label === "GitHub")?.href;
+  const frontendStrengths = [
+    "Reusable component architecture with scalable folder patterns",
+    "Performance optimization with lazy loading and render control",
+    "Strong API integration, error handling, and form validation",
+    "Pixel-perfect Figma-to-React implementation with responsive UX",
+  ];
 
   return (
     <div className="relative overflow-x-clip">
@@ -167,6 +174,25 @@ export default function Home() {
         </section>
 
         <section className="space-y-8">
+          <SectionHeading
+            id="strengths"
+            eyebrow="Recruiter Snapshot"
+            title="Why I Am a Strong Frontend Hire"
+            subtitle="Focused on maintainable architecture, business impact, and polished user experiences."
+          />
+          <div className="grid gap-4 md:grid-cols-2">
+            {frontendStrengths.map((item) => (
+              <article key={item} className="glass rounded-2xl border border-slate-700 p-5">
+                <p className="inline-flex items-start gap-2 text-slate-200">
+                  <FaStar className="mt-1 text-accent" />
+                  {item}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-8">
           <SectionHeading id="experience" eyebrow="Career" title="Professional Experience" />
           <div className="space-y-5">
             {experiences.map((item) => (
@@ -196,7 +222,7 @@ export default function Home() {
                 key={skill}
                 className="rounded-full bg-card px-4 py-2 text-sm text-slate-200 border border-slate-700 inline-flex items-center gap-2"
               >
-                <FaCode className="text-accent" />
+                <FaLayerGroup className="text-accent" />
                 {skill}
               </span>
             ))}
